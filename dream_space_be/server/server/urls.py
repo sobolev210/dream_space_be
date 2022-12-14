@@ -16,13 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.conf import settings
 from django.urls import path, include
-from dream_space.views import UserViewSet, ShopViewSet
+from dream_space.views import UserViewSet, ShopViewSet, ProductViewSet
 from rest_framework.routers import DefaultRouter
 from django.conf.urls.static import static
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'shops', ShopViewSet, basename='shop')
+router.register(r'products', ProductViewSet, basename='product')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

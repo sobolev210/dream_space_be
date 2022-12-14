@@ -3,8 +3,8 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-from .serializers import RegistrationSerializer, UserSerializer, ShopSerializer
-from .models import User, Shop
+from .serializers import RegistrationSerializer, UserSerializer, ShopSerializer, ProductSerializer, ShopCreateSerializer
+from .models import User, Shop, Product
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -42,4 +42,23 @@ class UserViewSet(viewsets.ModelViewSet):
 class ShopViewSet(viewsets.ModelViewSet):
     queryset = Shop.objects.all()
     serializer_class = ShopSerializer
+
+    def create(self, request, **kwargs):
+        serializer = ShopCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            shop = serializer.save()
+            return Response(
+                self.serializer_class(shop, context={"request": request}).data,
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    @action(detail=False, methods=['get'])
+    def categories(self, request, **kwargs):
+        return Response({category_names[0]: category_names[1] for category_names in Product.CATEGORY_CHOICES})
 

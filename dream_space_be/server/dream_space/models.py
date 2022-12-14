@@ -23,3 +23,33 @@ class Shop(models.Model):
     logo = models.ImageField(null=True)
 
 
+class Product(models.Model):
+    CATEGORY_CHOICES = [
+        ("BAT", "Bathroom"),
+        ("BED", "Bedroom"),
+        ("KIT", "Kitchen"),
+        ("LIV", "Living room"),
+        ("GAR", "Garden"),
+        ("COR", "Corridor"),
+        ("OTH", "Other")
+    ]
+    name = models.CharField(max_length=255, null=False)
+    description = models.TextField(null=True)
+    price = models.FloatField()
+    category = models.CharField(
+        max_length=3,
+        choices=CATEGORY_CHOICES,
+        null=False
+    )
+    length = models.FloatField(null=False)
+    width = models.FloatField(null=False)
+    height = models.FloatField(null=False)
+    #colours = ArrayField(models.CharField(max_length=10), null=True)
+    # not working for now when try to create object
+    # images = ArrayField(models.ImageField(), null=True)
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
+
+
+# class BuyRequest(models.Model):
+#     pass
+
