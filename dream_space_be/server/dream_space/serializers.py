@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Shop, Product
+from .models import User, Shop, Product, ProductImage, ProductColor
 from rest_framework.exceptions import NotFound
 
 
@@ -97,7 +97,36 @@ class UserSerializer(serializers.ModelSerializer):
         return data
 
 
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ["image"]
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        data = super().to_representation(instance)
+        data["image"] = request.build_absolute_uri(data["image"])
+        return data
+
+
 class ProductSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Product
         fields = "__all__"
+
+    def save(self, **kwargs):
+        product = super().save(**kwargs)
+        colors = self.validated_data.get("colors", [])
+        for color in colors:
+            product_color = ProductColor.objects.create(color=color, product=product)
+            product_color.save()
+        return product
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        data = super().to_representation(instance)
+        data["images"] = ProductImageSerializer(instance.images.all(), many=True, context={"request": request}).data
+        data["colors"] = instance.colors.values_list("color", flat=True)
+        return data
+

@@ -50,6 +50,16 @@ class Product(models.Model):
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
 
 
+class ProductImage(models.Model):
+    image = models.ImageField(null=False)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
+
+
+class ProductColor(models.Model):
+    color = models.CharField(max_length=10, null=False)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="colors")
+
+
 # class BuyRequest(models.Model):
 #     pass
 

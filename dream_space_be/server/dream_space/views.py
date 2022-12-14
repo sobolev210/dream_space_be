@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 
 from .serializers import RegistrationSerializer, UserSerializer, ShopSerializer, ProductSerializer, ShopCreateSerializer
-from .models import User, Shop, Product
+from .models import User, Shop, Product, ProductImage, ProductColor
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -57,6 +57,25 @@ class ShopViewSet(viewsets.ModelViewSet):
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+
+    def create(self, request, **kwargs):
+        images = request.FILES.getlist('images')
+        colors = request.data.pop("colors", [])
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            product = serializer.save()
+            for image in images:
+                product_image = ProductImage.objects.create(image=image, product=product)
+                product_image.save()
+            for color in colors:
+                product_color = ProductColor.objects.create(color=color, product=product)
+                product_color.save()
+            return Response(self.serializer_class(product, context={"request": request}).data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # def update(self, request, pk=None, *args, **kwargs):
+    #     images = request.FILES.getlist('images')
+    #     if images:
 
     @action(detail=False, methods=['get'])
     def categories(self, request, **kwargs):
