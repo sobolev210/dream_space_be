@@ -105,8 +105,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         request = self.context.get('request')
         data = super().to_representation(instance)
-        data["image"] = request.build_absolute_uri(data["image"])
-        return data
+        return request.build_absolute_uri(data["image"])
 
 
 class BaseProductSerializer(serializers.ModelSerializer):
