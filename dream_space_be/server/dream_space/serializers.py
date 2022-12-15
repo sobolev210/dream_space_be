@@ -61,7 +61,7 @@ class ShopCreateSerializer(ShopSerializer):
 class UserShopSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shop
-        fields = ["name", "logo"]
+        fields = ["id", "name", "logo"]
 
     def to_representation(self, instance):
         request = self.context.get('request')

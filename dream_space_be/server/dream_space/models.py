@@ -22,6 +22,7 @@ class Shop(models.Model):
     description = models.TextField(null=True)
     address = models.CharField(max_length=500, null=True)
     logo = models.ImageField(null=True)
+    contact = models.CharField(max_length=255, null=False)
 
 
 class Product(models.Model):
