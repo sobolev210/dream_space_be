@@ -99,7 +99,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def create(self, request, **kwargs):
         images = request.FILES.getlist('images')
-        colors = request.data.pop("colors", [])
+        colors = request.data.get("colors", [])
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             product = serializer.save()
