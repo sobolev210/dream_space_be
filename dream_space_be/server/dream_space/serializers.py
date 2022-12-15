@@ -109,7 +109,21 @@ class ProductImageSerializer(serializers.ModelSerializer):
         return data
 
 
-class ProductSerializer(serializers.ModelSerializer):
+class BaseProductSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Product
+        fields = "__all__"
+
+    def to_representation(self, instance):
+        request = self.context.get('request')
+        data = super().to_representation(instance)
+        data["images"] = ProductImageSerializer(instance.images.all(), many=True, context={"request": request}).data
+        data["colors"] = instance.colors.values_list("color", flat=True)
+        return data
+
+
+class ProductSerializer(BaseProductSerializer):
 
     class Meta:
         model = Product
@@ -123,10 +137,9 @@ class ProductSerializer(serializers.ModelSerializer):
             product_color.save()
         return product
 
-    def to_representation(self, instance):
-        request = self.context.get('request')
-        data = super().to_representation(instance)
-        data["images"] = ProductImageSerializer(instance.images.all(), many=True, context={"request": request}).data
-        data["colors"] = instance.colors.values_list("color", flat=True)
-        return data
 
+class ProductListSerializer(BaseProductSerializer):
+
+    class Meta:
+        model = Product
+        fields = ["id", "name", "price", "category"]

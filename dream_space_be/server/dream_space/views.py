@@ -2,9 +2,18 @@ from django.contrib.auth import authenticate, login, logout
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
 
-from .serializers import RegistrationSerializer, UserSerializer, ShopSerializer, ProductSerializer, ShopCreateSerializer
+
 from .models import User, Shop, Product, ProductImage, ProductColor
+from .serializers import (
+    RegistrationSerializer,
+    UserSerializer,
+    ShopSerializer,
+    ProductSerializer,
+    ShopCreateSerializer,
+    ProductListSerializer
+)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -14,8 +23,8 @@ class UserViewSet(viewsets.ModelViewSet):
     def create(self, request, **kwargs):
         serializer = RegistrationSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            user = serializer.save()
+            return Response(self.serializer_class(user).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'])
@@ -58,6 +67,30 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ProductListSerializer
+        else:
+            return self.serializer_class
+
+    def _update_images_and_colors(self, request, pk):
+        images = request.FILES.getlist('images')
+        colors = request.data.get("colors", [])
+        product = Product.objects.filter(pk=pk)
+        if not product:
+            raise NotFound(f"Product with id '{pk} not found.")
+        product = product.first()
+        if images:
+            product.images.all().delete()
+            for image in images:
+                product_image = ProductImage.objects.create(image=image, product=product)
+                product_image.save()
+        if colors:
+            product.colors.all().delete()
+            for color in colors:
+                product_color = ProductColor.objects.create(color=color, product=product)
+                product_color.save()
+
     def create(self, request, **kwargs):
         images = request.FILES.getlist('images')
         colors = request.data.pop("colors", [])
@@ -73,11 +106,14 @@ class ProductViewSet(viewsets.ModelViewSet):
             return Response(self.serializer_class(product, context={"request": request}).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # def update(self, request, pk=None, *args, **kwargs):
-    #     images = request.FILES.getlist('images')
-    #     if images:
+    def update(self, request, pk=None, *args, **kwargs):
+        self._update_images_and_colors(request, pk)
+        return super().update(request, pk, *args, **kwargs)
+
+    def partial_update(self, request, pk=None,  *args, **kwargs):
+        self._update_images_and_colors(request, pk)
+        return super().partial_update(request, pk, *args, **kwargs)
 
     @action(detail=False, methods=['get'])
     def categories(self, request, **kwargs):
         return Response({category_names[0]: category_names[1] for category_names in Product.CATEGORY_CHOICES})
-

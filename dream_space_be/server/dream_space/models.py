@@ -44,9 +44,6 @@ class Product(models.Model):
     length = models.FloatField(null=False)
     width = models.FloatField(null=False)
     height = models.FloatField(null=False)
-    #colours = ArrayField(models.CharField(max_length=10), null=True)
-    # not working for now when try to create object
-    # images = ArrayField(models.ImageField(), null=True)
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
 
 
