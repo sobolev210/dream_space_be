@@ -37,7 +37,8 @@ class ShopSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         request = self.context.get('request')
         data = super().to_representation(instance)
-        data["logo"] = request.build_absolute_uri(data["logo"])
+        if data["logo"]:
+            data["logo"] = request.build_absolute_uri(data["logo"])
         return data
 
 
