@@ -27,6 +27,12 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(self.serializer_class(user).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def partial_update(self, request, pk=None, *args, **kwargs):
+        res = super().partial_update(request, pk, *args, **kwargs)
+        if "favorites" in request.data and len(request.data) == 1:
+            return Response(f"Successfully added products {request.data.get('favorites', [])} to favorites.")
+        return res
+
     @action(detail=False, methods=['post'])
     def login(self, request, **kwargs):
         if 'email' not in request.data or 'password' not in request.data:

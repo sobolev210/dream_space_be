@@ -11,6 +11,7 @@ class User(AbstractUser):
     telegram_alias = models.CharField(max_length=255, null=True, blank=True)
     settings = models.TextField(null=True, blank=True)
     shops = models.ManyToManyField("Shop")
+    favorites = models.ManyToManyField("Product")
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name"]
