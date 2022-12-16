@@ -88,9 +88,8 @@ class ProductViewSet(viewsets.ModelViewSet):
         else:
             return self.serializer_class
 
-    def _update_images_and_colors(self, request, pk):
+    def _update_images(self, request, pk):
         images = request.FILES.getlist('images')
-        colors = request.data.get("colors", [])
         product = Product.objects.filter(pk=pk)
         if not product:
             raise NotFound(f"Product with id '{pk}' not found.")
@@ -100,33 +99,24 @@ class ProductViewSet(viewsets.ModelViewSet):
             for image in images:
                 product_image = ProductImage.objects.create(image=image, product=product)
                 product_image.save()
-        if colors:
-            product.colors.all().delete()
-            for color in colors:
-                product_color = ProductColor.objects.create(color=color, product=product)
-                product_color.save()
 
     def create(self, request, **kwargs):
         images = request.FILES.getlist('images')
-        colors = request.data.get("colors", [])
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             product = serializer.save()
             for image in images:
                 product_image = ProductImage.objects.create(image=image, product=product)
                 product_image.save()
-            for color in colors:
-                product_color = ProductColor.objects.create(color=color, product=product)
-                product_color.save()
             return Response(self.serializer_class(product, context={"request": request}).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, pk=None, *args, **kwargs):
-        self._update_images_and_colors(request, pk)
+        self._update_images(request, pk)
         return super().update(request, pk, *args, **kwargs)
 
     def partial_update(self, request, pk=None,  *args, **kwargs):
-        self._update_images_and_colors(request, pk)
+        self._update_images(request, pk)
         return super().partial_update(request, pk, *args, **kwargs)
 
     @action(detail=False, methods=['get'])

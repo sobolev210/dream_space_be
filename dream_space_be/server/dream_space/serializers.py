@@ -131,13 +131,16 @@ class BaseProductSerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(BaseProductSerializer):
+    colors = serializers.ListField(child=serializers.CharField(max_length=10), write_only=True)
 
     def save(self, **kwargs):
+        colors = self.validated_data.pop("colors", None)
         product = super().save(**kwargs)
-        colors = self.validated_data.get("colors", [])
-        for color in colors:
-            product_color = ProductColor.objects.create(color=color, product=product)
-            product_color.save()
+        if colors is not None:
+            product.colors.all().delete()
+            for color in colors:
+                product_color = ProductColor.objects.create(color=color, product=product)
+                product_color.save()
         return product
 
 
