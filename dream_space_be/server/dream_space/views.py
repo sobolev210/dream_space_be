@@ -68,6 +68,15 @@ class ShopViewSet(viewsets.ModelViewSet):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=True, methods=['get'])
+    def products(self, request, pk=None, **kwargs):
+        shop = Shop.objects.filter(pk=pk)
+        if not shop:
+            raise NotFound(f"Product with id '{pk} not found.")
+        shop = shop.first()
+        data = ProductListSerializer(shop.products.all(), many=True, context={"request": request}).data
+        return Response(data)
+
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()

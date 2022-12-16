@@ -46,7 +46,7 @@ class Product(models.Model):
     length = models.FloatField(null=False)
     width = models.FloatField(null=False)
     height = models.FloatField(null=False)
-    shop = models.ForeignKey(Shop, on_delete=models.CASCADE)
+    shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name="products")
 
 
 class ProductImage(models.Model):
