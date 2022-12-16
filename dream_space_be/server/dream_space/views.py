@@ -72,7 +72,7 @@ class ShopViewSet(viewsets.ModelViewSet):
     def products(self, request, pk=None, **kwargs):
         shop = Shop.objects.filter(pk=pk)
         if not shop:
-            raise NotFound(f"Product with id '{pk} not found.")
+            raise NotFound(f"Shop with id '{pk}' not found.")
         shop = shop.first()
         data = ProductListSerializer(shop.products.all(), many=True, context={"request": request}).data
         return Response(data)
@@ -93,7 +93,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         colors = request.data.get("colors", [])
         product = Product.objects.filter(pk=pk)
         if not product:
-            raise NotFound(f"Product with id '{pk} not found.")
+            raise NotFound(f"Product with id '{pk}' not found.")
         product = product.first()
         if images:
             product.images.all().delete()
