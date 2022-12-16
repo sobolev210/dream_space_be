@@ -120,14 +120,17 @@ class BaseProductSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         data["images"] = ProductImageSerializer(instance.images.all(), many=True, context={"request": request}).data
         data["colors"] = instance.colors.values_list("color", flat=True)
+        shop_id = data.pop("shop", None)
+        shop = Shop.objects.filter(pk=shop_id)
+        if not shop:
+            raise NotFound(f"Shop with id '{shop_id}' for product {data.get('name')} not found.")
+        shop = shop.first()
+        data["shop_id"] = shop_id
+        data["shop_name"] = shop.name
         return data
 
 
 class ProductSerializer(BaseProductSerializer):
-
-    class Meta:
-        model = Product
-        fields = "__all__"
 
     def save(self, **kwargs):
         product = super().save(**kwargs)
@@ -142,14 +145,5 @@ class ProductListSerializer(BaseProductSerializer):
 
     class Meta:
         model = Product
-        fields = ["id", "name", "price", "category", "shop_id"]
+        fields = ["id", "name", "price", "category", "shop"]
 
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        shop_id = data.get("shop_id")
-        shop = Shop.objects.filter(pk=shop_id)
-        if not shop:
-            raise NotFound(f"Shop with id '{shop_id}' for product {data.get('name')} not found.")
-        shop = shop.first()
-        data["shop_name"] = shop.name
-        return data
