@@ -142,4 +142,14 @@ class ProductListSerializer(BaseProductSerializer):
 
     class Meta:
         model = Product
-        fields = ["id", "name", "price", "category"]
+        fields = ["id", "name", "price", "category", "shop_id"]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        shop_id = data.get("shop_id")
+        shop = Shop.objects.filter(pk=shop_id)
+        if not shop:
+            raise NotFound(f"Shop with id '{shop_id}' for product {data.get('name')} not found.")
+        shop = shop.first()
+        data["shop_name"] = shop.name
+        return data
