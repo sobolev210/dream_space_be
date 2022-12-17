@@ -72,6 +72,12 @@ class UserShopSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    favorites = serializers.PrimaryKeyRelatedField(
+        many=True, read_only=False, queryset=Product.objects.all(), required=False
+    )
+    shops = serializers.PrimaryKeyRelatedField(
+        many=True, read_only=False, queryset=Shop.objects.all(), required=False
+    )
 
     class Meta:
         model = User

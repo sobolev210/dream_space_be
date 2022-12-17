@@ -30,7 +30,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, pk=None, *args, **kwargs):
         res = super().partial_update(request, pk, *args, **kwargs)
         if "favorites" in request.data and len(request.data) == 1:
-            return Response(f"Successfully added products {request.data.get('favorites', [])} to favorites.")
+            return Response(f"Successfully updated user's favorites with products: {request.data.get('favorites', [])}.")
         return res
 
     @action(detail=False, methods=['post'])
