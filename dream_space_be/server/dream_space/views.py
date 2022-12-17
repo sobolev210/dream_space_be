@@ -45,7 +45,7 @@ class UserViewSet(viewsets.ModelViewSet):
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            return Response(self.serializer_class(user).data, status=status.HTTP_200_OK)
+            return Response(self.serializer_class(user, context={"request": request}).data, status=status.HTTP_200_OK)
         return Response({'msg': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
     @action(detail=True, methods=['post'])
