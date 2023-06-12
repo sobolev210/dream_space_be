@@ -15,6 +15,8 @@ Python, Django, Django REST framework, Docker
 Here are some screenshots of the resulting system
 
 Furniture list:
+
+
 ![image](https://github.com/sobolev210/dream_space_be/assets/68656754/b55a756e-f3e0-4c7d-b217-706a1d11120a)
 
 Creating particular product (furniture that design studio wants to place on the marketplace):
