@@ -25,5 +25,5 @@ Creating particular product (furniture that design studio wants to place on the 
 ![image](https://github.com/sobolev210/dream_space_be/assets/68656754/46be180d-9290-4c80-8031-622b93245958)
 
 
-Thanks to [GuVictory](https://github.com/GuVictory) for beatiful frontend :)
+Thanks to [GuVictory](https://github.com/GuVictory) for beautiful frontend :)
 
